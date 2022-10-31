@@ -10,27 +10,35 @@ import (
 
 func deleteContact(l *list.LinkedList) {
 	name := getName()
-	err := l.DeleteContact(name)
+	node, err := l.GetNode(name)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
+	l.DeleteContact(node)
+	fmt.Println(name, "successfully deleted")
 }
 
 func enterContact(ll *list.LinkedList) {
 	name := getName()
 	fmt.Println()
 	phone := getPhone()
-	ll.Insert(name, phone)
-}
-
-func getContact(l *list.LinkedList) {
-	name := getName()
-	contact, err := l.GetContact(name)
+	err := ll.Insert(name, phone)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(contact.Name, "-", contact.Phone)
+	fmt.Println(name, "entered to contacts")
+}
+
+func printContact(l *list.LinkedList) {
+	name := getName()
+	node, err := l.GetNode(name)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(node.Data.Name, "-", node.Data.Phone)
 }
 
 func getName() string {
@@ -48,7 +56,10 @@ func getPhone() string {
 }
 
 func printContacts(l *list.LinkedList) {
-	l.PrintContacts()
+	contacts := l.PrintContacts()
+	for _, contact := range contacts {
+		fmt.Println(contact.Name, "-", contact.Phone)
+	}
 }
 
 func printOptions() {
@@ -63,10 +74,16 @@ func printOptions() {
 
 func updateContact(l *list.LinkedList) {
 	name := getName()
-	err := l.UpdateContact(name)
+	node, err := l.GetNode(name)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
+	s := bufio.NewScanner(os.Stdin)
+	fmt.Print("Enter new phone: ")
+	s.Scan()
+	l.UpdateContact(&node.Data, s.Text())
+	fmt.Println(name, "updated")
 }
 
 func StartProgram() {
@@ -88,7 +105,7 @@ func StartProgram() {
 		case "1":
 			enterContact(&ll)
 		case "2":
-			getContact(&ll)
+			printContact(&ll)
 		case "3":
 			printContacts(&ll)
 		case "4":

@@ -1,10 +1,7 @@
 package list
 
 import (
-	"bufio"
 	"errors"
-	"fmt"
-	"os"
 )
 
 type LinkedList struct {
@@ -13,7 +10,7 @@ type LinkedList struct {
 }
 
 type listNode struct {
-	data contact
+	Data contact
 	next *listNode
 	prev *listNode
 }
@@ -23,43 +20,35 @@ type contact struct {
 	Phone string
 }
 
-func (l *LinkedList) DeleteContact(n string) error {
-	curr_node := l.head
-	for curr_node != nil && curr_node.data.Name != n {
-		curr_node = curr_node.next
-	}
-	if curr_node != nil {
-		if curr_node.next != nil {
-			curr_node.next.prev = curr_node.prev
-		} else {
-			l.tail = curr_node.prev
-		}
-		if curr_node.prev != nil {
-			curr_node.prev.next = curr_node.next
-		} else {
-			l.head = curr_node.next
-		}
-		return nil
+func (l *LinkedList) DeleteContact(c *listNode) {
+	if c.next != nil {
+		c.next.prev = c.prev
 	} else {
-		return errors.New("name not found")
+		l.tail = c.prev
+	}
+	if c.prev != nil {
+		c.prev.next = c.next
+	} else {
+		l.head = c.next
 	}
 }
 
-func (l *LinkedList) GetContact(n string) (contact, error) {
+func (l *LinkedList) GetNode(n string) (*listNode, error) {
 	curr_node := l.head
-	for curr_node.data.Name != n && curr_node != nil {
+	for curr_node != nil && curr_node.Data.Name != n {
 		curr_node = curr_node.next
 	}
 	if curr_node != nil {
-		return curr_node.data, nil
+		return curr_node, nil
 	} else {
-		return contact{}, errors.New("name not found")
+		return &listNode{}, errors.New("name not found")
 	}
 }
 
-func (l *LinkedList) Insert(n string, p string) {
+func (l *LinkedList) Insert(n string, p string) error {
+	var err error
 	new_node := &listNode{
-		data: contact{
+		Data: contact{
 			Name:  n,
 			Phone: p,
 		},
@@ -70,7 +59,7 @@ func (l *LinkedList) Insert(n string, p string) {
 	} else {
 		curr_node := l.head
 		for curr_node != nil {
-			if new_node.data.Name > curr_node.data.Name {
+			if new_node.Data.Name > curr_node.Data.Name {
 				if curr_node.next != nil {
 					curr_node = curr_node.next
 				} else {
@@ -79,7 +68,7 @@ func (l *LinkedList) Insert(n string, p string) {
 					new_node.prev = curr_node
 					curr_node = nil
 				}
-			} else if new_node.data.Name < curr_node.data.Name {
+			} else if new_node.Data.Name < curr_node.Data.Name {
 				if curr_node.prev == nil {
 					curr_node.prev = new_node
 					new_node.next = curr_node
@@ -93,33 +82,24 @@ func (l *LinkedList) Insert(n string, p string) {
 					curr_node = nil
 				}
 			} else {
-				fmt.Println("This name already exists")
+				err = errors.New("name already exists")
 				curr_node = nil
 			}
 		}
 	}
+	return err
 }
 
-func (l *LinkedList) PrintContacts() {
+func (l *LinkedList) PrintContacts() []contact {
 	curr_node := l.head
+	var contactSlice []contact
 	for curr_node != nil {
-		fmt.Println(curr_node.data.Name, " - ", curr_node.data.Phone)
+		contactSlice = append(contactSlice, curr_node.Data)
 		curr_node = curr_node.next
 	}
+	return contactSlice
 }
 
-func (l *LinkedList) UpdateContact(n string) error {
-	curr_node := l.head
-	for curr_node != nil && curr_node.data.Name != n {
-		curr_node = curr_node.next
-	}
-	if curr_node == nil {
-		return errors.New("name not found")
-	}
-	s := bufio.NewScanner(os.Stdin)
-	fmt.Print("Enter new phone number: ")
-	s.Scan()
-	curr_node.data.Phone = s.Text()
-	fmt.Println(curr_node.data.Name+"'s number has been updated.")
-	return nil
+func (l *LinkedList) UpdateContact(c *contact, newPhone string) {
+	c.Phone = newPhone
 }
