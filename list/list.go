@@ -45,7 +45,7 @@ func (l *LinkedList) GetNode(n string) (*listNode, error) {
 	}
 }
 
-func (l *LinkedList) Insert(n string, p string) error {
+func (l *LinkedList) InsertContact(n string, p string) error {
 	var err error
 	new_node := &listNode{
 		Data: contact{

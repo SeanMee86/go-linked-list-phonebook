@@ -8,61 +8,84 @@ import (
 	"github.com/SeanMee86/phonebook/list"
 )
 
-func deleteContact(l *list.LinkedList) {
-	name := getName()
+var colors = map[string]string{
+	"blue": "\033[34m",
+	"green": "\033[32m",
+	"red": "\033[31m",
+	"reset": "\033[0m",
+}
+
+func deleteContact(l *list.LinkedList, s *bufio.Scanner) {
+	name := getName(s)
 	node, err := l.GetNode(name)
 	if err != nil {
-		fmt.Println(err)
+		printError(err)
 		return
 	}
 	l.DeleteContact(node)
-	fmt.Println(name, "successfully deleted")
+	coloredName := colors["red"]+name+colors["reset"]
+	fmt.Println("\nContact", coloredName, "successfully deleted")
+	optionsMessage()
 }
 
-func enterContact(ll *list.LinkedList) {
-	name := getName()
-	fmt.Println()
-	phone := getPhone()
-	err := ll.Insert(name, phone)
+func enterContact(ll *list.LinkedList, s *bufio.Scanner) {
+	name := getName(s)
+	phone := getPhone(s)
+	err := ll.InsertContact(name, phone)
 	if err != nil {
-		fmt.Println(err)
+		printError(err)
 		return
 	}
-	fmt.Println(name, "entered to contacts")
+	coloredName := colors["green"]+name+colors["reset"]
+	fmt.Println("\n" + coloredName, "has been added to contacts!")
+	optionsMessage()
 }
 
-func printContact(l *list.LinkedList) {
-	name := getName()
+func getName(s *bufio.Scanner) string {
+	fmt.Print("\nEnter name: ")
+	s.Scan()
+	return s.Text()
+}
+
+func getPhone(s *bufio.Scanner) string {
+	fmt.Print("Enter phone number: ")
+	s.Scan()
+	return s.Text()
+}
+
+func optionsMessage() {
+	fmt.Println("\n6 to see options.")
+	fmt.Println()
+}
+
+func printContact(l *list.LinkedList, s *bufio.Scanner) {
+	name := getName(s)
 	node, err := l.GetNode(name)
 	if err != nil {
-		fmt.Println(err)
+		printError(err)
 		return
 	}
-	fmt.Println(node.Data.Name, "-", node.Data.Phone)
-}
-
-func getName() string {
-	s := bufio.NewScanner(os.Stdin)
-	fmt.Print("Enter name: ")
-	s.Scan()
-	return s.Text()
-}
-
-func getPhone() string {
-	s := bufio.NewScanner(os.Stdin)
-	fmt.Print("Phone: ")
-	s.Scan()
-	return s.Text()
+	fmt.Println("\n"+node.Data.Name, "-", node.Data.Phone)
+	optionsMessage()
 }
 
 func printContacts(l *list.LinkedList) {
+	fmt.Println()
 	contacts := l.PrintContacts()
 	for _, contact := range contacts {
 		fmt.Println(contact.Name, "-", contact.Phone)
 	}
+	optionsMessage()
+}
+
+func printError(msg error) {
+	fmt.Println()
+	fmt.Println(colors["red"]+msg.Error()+colors["reset"])
+	optionsMessage()
 }
 
 func printOptions() {
+	fmt.Println()
 	fmt.Println("1: Enter contact information")
 	fmt.Println("2: Retrieve contact information")
 	fmt.Println("3: Print contacts")
@@ -70,54 +93,57 @@ func printOptions() {
 	fmt.Println("5: Delete contact")
 	fmt.Println("6: See options")
 	fmt.Println("7: Exit program")
+	fmt.Println()
 }
 
-func updateContact(l *list.LinkedList) {
-	name := getName()
+func updateContact(l *list.LinkedList, s *bufio.Scanner) {
+	name := getName(s)
 	node, err := l.GetNode(name)
 	if err != nil {
-		fmt.Println(err)
+		printError(err)
 		return
 	}
-	s := bufio.NewScanner(os.Stdin)
 	fmt.Print("Enter new phone: ")
 	s.Scan()
 	l.UpdateContact(&node.Data, s.Text())
-	fmt.Println(name, "updated")
+	coloredName := colors["blue"]+name+colors["reset"]
+	fmt.Println("\nContact", coloredName, "has been updated.")
+	optionsMessage()
 }
 
 func StartProgram() {
 	s := bufio.NewScanner(os.Stdin)
 	var o string
 	var ll list.LinkedList
-
-	fmt.Println("Welcome to Phonebook")
-	fmt.Println("Please select one of the below options")
 	fmt.Println()
+	fmt.Println()
+	fmt.Println("*************** Welcome to Phonebook ***************")
+	fmt.Println()
+	fmt.Println("****** Please select one of the below options ******")
+	printOptions()
 
 	for o != "7" {
-		if o == "" {
-			printOptions()
-		}
 		s.Scan()
 		o = s.Text()
 		switch o {
 		case "1":
-			enterContact(&ll)
+			enterContact(&ll, s)
 		case "2":
-			printContact(&ll)
+			printContact(&ll, s)
 		case "3":
 			printContacts(&ll)
 		case "4":
-			updateContact(&ll)
+			updateContact(&ll, s)
 		case "5":
-			deleteContact(&ll)
+			deleteContact(&ll, s)
 		case "6":
 			printOptions()
 		case "7":
-			fmt.Println("exiting program")
+			fmt.Println("\nExiting program...")
 		default:
-			fmt.Println("unknown command")
+			fmt.Println()
+			fmt.Println("Unknown Command")
+			optionsMessage()
 		}
 	}
 }
