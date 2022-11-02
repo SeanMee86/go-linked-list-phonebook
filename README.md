@@ -1,4 +1,4 @@
-# <center>Go Phonebook Console App</center>
+# <p align="center">Go Phonebook Console App</p>
 
 A basic console application for storing, retrieving(1 or all), updating, and deleting contacts. 
 
