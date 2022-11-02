@@ -20,16 +20,16 @@ type contact struct {
 	Phone string
 }
 
-func (l *LinkedList) DeleteContact(c *listNode) {
-	if c.next != nil {
-		c.next.prev = c.prev
+func (l *LinkedList) DeleteContact(n *listNode) {
+	if n.next != nil {
+		n.next.prev = n.prev
 	} else {
-		l.tail = c.prev
+		l.tail = n.prev
 	}
-	if c.prev != nil {
-		c.prev.next = c.next
+	if n.prev != nil {
+		n.prev.next = n.next
 	} else {
-		l.head = c.next
+		l.head = n.next
 	}
 }
 
@@ -90,7 +90,7 @@ func (l *LinkedList) InsertContact(n string, p string) error {
 	return err
 }
 
-func (l *LinkedList) PrintContacts() []contact {
+func (l *LinkedList) GetContacts() []contact {
 	curr_node := l.head
 	var contactSlice []contact
 	for curr_node != nil {

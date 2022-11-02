@@ -28,10 +28,10 @@ func deleteContact(l *list.LinkedList, s *bufio.Scanner) {
 	optionsMessage()
 }
 
-func enterContact(ll *list.LinkedList, s *bufio.Scanner) {
+func enterContact(l *list.LinkedList, s *bufio.Scanner) {
 	name := getName(s)
 	phone := getPhone(s)
-	err := ll.InsertContact(name, phone)
+	err := l.InsertContact(name, phone)
 	if err != nil {
 		printError(err)
 		return
@@ -71,7 +71,7 @@ func printContact(l *list.LinkedList, s *bufio.Scanner) {
 
 func printContacts(l *list.LinkedList) {
 	fmt.Println()
-	contacts := l.PrintContacts()
+	contacts := l.GetContacts()
 	for _, contact := range contacts {
 		fmt.Println(contact.Name, "-", contact.Phone)
 	}
